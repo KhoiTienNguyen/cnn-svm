@@ -20,7 +20,9 @@ __version__ = "0.1.0"
 __author__ = "Abien Fred Agarap"
 
 import os
-import tensorflow as tf
+#import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 import time
 import sys
 

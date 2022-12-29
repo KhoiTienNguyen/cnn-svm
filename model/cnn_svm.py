@@ -20,7 +20,9 @@ __version__ = "0.1.0"
 __author__ = "Abien Fred Agarap"
 
 import os
-import tensorflow as tf
+#import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 import time
 import sys
 
@@ -43,7 +45,7 @@ class CNNSVM:
         self.penalty_parameter = penalty_parameter
 
         def __graph__():
-
+            
             with tf.name_scope("input"):
                 # [BATCH_SIZE, NUM_FEATURES]
                 x_input = tf.placeholder(
@@ -61,7 +63,7 @@ class CNNSVM:
 
             input_image = tf.reshape(x_input, [-1, 28, 28, 1])
 
-            first_conv_activation = tf.nn.relu(
+            first_conv_activation = tf.nn.leaky_relu(
                 self.conv2d(input_image, first_conv_weight) + first_conv_bias
             )
             first_conv_pool = self.max_pool_2x2(first_conv_activation)
@@ -70,7 +72,7 @@ class CNNSVM:
             second_conv_weight = self.weight_variable([5, 5, 32, 64])
             second_conv_bias = self.bias_variable([64])
 
-            second_conv_activation = tf.nn.relu(
+            second_conv_activation = tf.nn.leaky_relu(
                 self.conv2d(first_conv_pool, second_conv_weight) + second_conv_bias
             )
             second_conv_pool = self.max_pool_2x2(second_conv_activation)
@@ -80,7 +82,7 @@ class CNNSVM:
             dense_layer_bias = self.bias_variable([1024])
 
             second_conv_pool_flatten = tf.reshape(second_conv_pool, [-1, 7 * 7 * 64])
-            dense_layer_activation = tf.nn.relu(
+            dense_layer_activation = tf.nn.leaky_relu(
                 tf.matmul(second_conv_pool_flatten, dense_layer_weight)
                 + dense_layer_bias
             )
@@ -93,19 +95,22 @@ class CNNSVM:
             readout_weight = self.weight_variable([1024, num_classes])
             readout_bias = self.bias_variable([num_classes])
 
-            output = tf.matmul(h_fc1_drop, readout_weight) + readout_bias
+            #yi'*output
+            output = tf.matmul(h_fc1_drop, readout_weight) + readout_bias 
 
             with tf.name_scope("svm"):
-                regularization_loss = tf.reduce_mean(tf.square(readout_weight))
+                
+                dis=tf.transpose(readout_weight)
+                regularization_loss = tf.reduce_mean(tf.matmul(dis,readout_weight))#mean of each row 
                 hinge_loss = tf.reduce_mean(
                     tf.square(
                         tf.maximum(
-                            tf.zeros([batch_size, num_classes]), 1 - y_input * output
+                            tf.zeros([batch_size, num_classes]), 1 - y_input * output #inside summation 
                         )
                     )
                 )
                 with tf.name_scope("loss"):
-                    loss = regularization_loss + penalty_parameter * hinge_loss
+                    loss = regularization_loss + penalty_parameter * hinge_loss #L2-SVM
             tf.summary.scalar("loss", loss)
 
             optimizer = tf.train.AdamOptimizer(learning_rate=alpha).minimize(loss)

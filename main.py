@@ -22,7 +22,12 @@ __author__ = "Abien Fred Agarap"
 import argparse
 from model.cnn_softmax import CNN
 from model.cnn_svm import CNNSVM
-from tensorflow.examples.tutorials.mnist import input_data
+import input_data
+#import tensorflow_datasets as tfds
+
+#import tensorflow_datasets
+#mnist = tensorflow_datasets.load('mnist')
+#from tensorflow.examples.tutorials.mnist import input_data
 
 
 def parse_args():
@@ -65,6 +70,8 @@ if __name__ == "__main__":
     args = parse_args()
 
     mnist = input_data.read_data_sets(args.dataset, one_hot=True)
+    #mnist = tfds.load(name='mnist')
+    #print(mnist.train)
     num_classes = mnist.train.labels.shape[1]
     sequence_length = mnist.train.images.shape[1]
     model_choice = args.model
