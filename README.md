@@ -11,4 +11,5 @@ Fashion-MNIST datasets respectively. On the other hand, the CNN model with a SVM
 accuracy of 99.17% and 91.75% for MNIST and Fashion-MNIST datasets respectively.
 
 Authors: Chloe Mills, Shania Wan-Bok-Nale, Khoi Nguyen
+
 Original Code's Author: Abien Fred Agarap
